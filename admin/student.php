@@ -1,13 +1,29 @@
 <?php
 session_start();
 $conn = mysqli_connect('localhost', 'root', '', 'attendance_app');
+if (isset($_GET['id'])) {
+    if ($conn) {
+        $id = $_GET['id'];
+        $sql = "SELECT * FROM users WHERE id = '$id' AND role = 'student'";
 
-if ($conn) {
-    $sql = "SELECT * FROM users WHERE role = 'student'";
+        $user_res = mysqli_query($conn, $sql);
+        $user = mysqli_fetch_assoc($user_res);
+    } else {
+        echo "Couldn't connect to database.";
+    }
+} else if (isset($_POST['id'])) {
 
-    $student_res = mysqli_query($conn, $sql);
+    if ($conn) {
+        $id = $_POST['id'];
+        $sql = "DELETE FROM users WHERE id = '$id'";
+
+        mysqli_query($conn, $sql);
+        header('location: /attendance_app/admin/student_management.php');
+    } else {
+        echo "Couldn't connect to database.";
+    }
 } else {
-    echo "Couldn't connect to database.";
+    header('location: /attendance_app/admin/student_management.php');
 }
 include('../logout.php');
 
@@ -60,37 +76,18 @@ include('../logout.php');
                 </div>
                 <div class="col-8">
                     <div class="card shadow">
+                        <div class="card-header bg-secondary-subtle">Student Profile</div>
                         <div class="card-body">
-                            <div class="display-6">Student Management</div>
-                            <div class="row mt-4">
-                                <div class="col-12">
-
-                                    <table class="table table-striped align-middle">
-                                        <thead>
-                                            <tr class="table-primary">
-                                                <th>Name</th>
-                                                <th>Username</th>
-                                                <th>Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <?php while ($row = $student_res->fetch_assoc()) : ?>
-                                                <tr>
-                                                    <td><?php echo $row['name']; ?></td>
-                                                    <td><?php echo $row['username']; ?></td>
-                                                    <td class="d-flex justify-content-evenly">
-                                                        <a href="/attendance_app/admin/student.php?id=<?php echo $row['id']; ?>" class="btn btn-primary">View Details</a>
-                                                        <form action="/attendance_app/admin/student.php?" method="POST">
-                                                            <input type="hidden" name="id" id="id" value="<?php echo $row['id']; ?>" />
-                                                            <button type="submit" class="btn btn-danger">Delete User</button>
-                                                        </form>
-                                                    </td>
-                                                </tr>
-                                            <?php endwhile; ?>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
+                            <table class="table">
+                                <tr>
+                                    <td>Name</td>
+                                    <td><?php echo $user['name']; ?></td>
+                                </tr>
+                                <tr>
+                                    <td>Username</td>
+                                    <td><?php echo $user['username']; ?></td>
+                                </tr>
+                            </table>
                         </div>
                     </div>
                 </div>

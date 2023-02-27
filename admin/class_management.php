@@ -3,9 +3,9 @@ session_start();
 $conn = mysqli_connect('localhost', 'root', '', 'attendance_app');
 
 if ($conn) {
-    $sql = "SELECT * FROM users WHERE role = 'student'";
+    $sql = "SELECT S.name AS student_name, P.* FROM parents P INNER JOIN users S ON P.student_id = S.id";
 
-    $student_res = mysqli_query($conn, $sql);
+    $parent_res = mysqli_query($conn, $sql);
 } else {
     echo "Couldn't connect to database.";
 }
@@ -61,32 +61,33 @@ include('../logout.php');
                 <div class="col-8">
                     <div class="card shadow">
                         <div class="card-body">
-                            <div class="display-6">Student Management</div>
+                            <div class="display-6">Class Management</div>
                             <div class="row mt-4">
                                 <div class="col-12">
 
                                     <table class="table table-striped align-middle">
                                         <thead>
                                             <tr class="table-primary">
-                                                <th>Name</th>
-                                                <th>Username</th>
+                                                <th>Class ID</th>
+                                                <th>Class Title</th>
                                                 <th>Actions</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <?php while ($row = $student_res->fetch_assoc()) : ?>
+                                            <!-- <?php while ($row = $parent_res->fetch_assoc()) : ?>
                                                 <tr>
                                                     <td><?php echo $row['name']; ?></td>
-                                                    <td><?php echo $row['username']; ?></td>
+                                                    <td><?php echo $row['student_name']; ?></td>
+                                                    <td><?php echo $row['email_address']; ?></td>
                                                     <td class="d-flex justify-content-evenly">
-                                                        <a href="/attendance_app/admin/student.php?id=<?php echo $row['id']; ?>" class="btn btn-primary">View Details</a>
-                                                        <form action="/attendance_app/admin/student.php?" method="POST">
+                                                        <a href="/attendance_app/admin/faculty.php?id=<?php echo $row['id']; ?>" class="btn btn-primary">View Details</a>
+                                                        <form action="/attendance_app/admin/faculty.php?" method="POST">
                                                             <input type="hidden" name="id" id="id" value="<?php echo $row['id']; ?>" />
                                                             <button type="submit" class="btn btn-danger">Delete User</button>
                                                         </form>
                                                     </td>
                                                 </tr>
-                                            <?php endwhile; ?>
+                                            <?php endwhile; ?> -->
                                         </tbody>
                                     </table>
                                 </div>
