@@ -1,6 +1,7 @@
 <?php
 session_start();
-$conn = mysqli_connect('localhost', 'root', '', 'attendance_app');
+include('../../../config.php');
+$conn = mysqli_connect($host, $username, $password, $database);
 
 if ($conn) {
     $sql = "SELECT * FROM questionnaire";

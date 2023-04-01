@@ -1,12 +1,14 @@
 <?php
+include("../config.php");
 session_start();
 
 if (isset($_POST['submit'])) {
-    if (!empty($_POST['name']) && !empty($_POST['username']) && !empty($_POST['password']) && !empty($_POST['password_confirm'])) {
+    if (!empty($_POST['first_name']) && !empty($_POST['last_name']) && !empty($_POST['username']) && !empty($_POST['password']) && !empty($_POST['password_confirm'])) {
         if ($_POST['password'] === $_POST['password_confirm']) {
-            $conn = mysqli_connect('localhost', 'root', '', 'attendance_app');
+            $conn = mysqli_connect($host, $username, $password, $database);
 
-            $name = $_POST['name'];
+            $first_name = $_POST['first_name'];
+            $last_name = $_POST['last_name'];
             $username = $_POST['username'];
             $password = md5($_POST['password']);
             $role = 'student';
@@ -20,12 +22,14 @@ if (isset($_POST['submit'])) {
                 if (mysqli_num_rows($res) != 0) {
                     $result = array("status" => "danger", "message" => "Username already Exists");
                 } else {
-                    $sql = "INSERT into users (name, role, username, password) values ('$name', '$role', '$username', '$password')";
+                    $sql = "INSERT into users (first_name, last_name, role, username, password) values ('$first_name', '$last_name', '$role', '$username', '$password')";
 
                     if (mysqli_query($conn, $sql)) {
                         $result = array("status" => "success", "message" => "Account Created");
                     } else {
                         $result = array("status" => "danger", "message" => "Registration Failed");
+                        echo "hit";
+                        die();
                     }
                 }
             } else {
@@ -42,10 +46,11 @@ if (isset($_POST['submit'])) {
     $_SESSION['flash_message'] = $result['message'];
 
     if ($result['status'] == "danger") {
-        header('location: /attendance_app/register.php');
+        header("location: $rootURL/register.php");
     } else {
-        header('location: /attendance_app/index.php');
+        header("location: $rootURL/index.php");
     }
+    session_write_close();
 }
 ?>
 <!DOCTYPE html>
@@ -78,8 +83,12 @@ if (isset($_POST['submit'])) {
                         ?>
                         <form method="POST">
                             <div class="form-floating mb-3">
-                                <input type="text" name="name" class="form-control" placeholder="John Doe" required>
-                                <label for="floatingInput">Name</label>
+                                <input type="text" name="first_name" class="form-control" placeholder="Juan" required>
+                                <label for="floatingInput">First </label>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input type="text" name="last_name" class="form-control" placeholder="Dela Cruz" required>
+                                <label for="floatingInput">Last Name</label>
                             </div>
                             <div class="form-floating mb-3">
                                 <input type="text" name="username" class="form-control" placeholder="johndoe27" required>

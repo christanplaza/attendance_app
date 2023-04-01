@@ -1,6 +1,7 @@
 <?php
 session_start();
-$conn = mysqli_connect('localhost', 'root', '', 'attendance_app');
+include('../../config.php');
+$conn = mysqli_connect($host, $username, $password, $database);
 
 if ($conn) {
     $sql = "SELECT * FROM users WHERE role = 'faculty'";
@@ -68,7 +69,8 @@ include('../logout.php');
                                     <table class="table table-striped align-middle">
                                         <thead>
                                             <tr class="table-primary">
-                                                <th>Name</th>
+                                                <th>Last Name</th>
+                                                <th>First Name</th>
                                                 <th>Username</th>
                                                 <th>Actions</th>
                                             </tr>
@@ -76,11 +78,12 @@ include('../logout.php');
                                         <tbody>
                                             <?php while ($row = $faculty_res->fetch_assoc()) : ?>
                                                 <tr>
-                                                    <td><?php echo $row['name']; ?></td>
+                                                    <td><?php echo $row['last_name']; ?></td>
+                                                    <td><?php echo $row['first_name']; ?></td>
                                                     <td><?php echo $row['username']; ?></td>
                                                     <td class="d-flex justify-content-evenly">
-                                                        <a href="/attendance_app/admin/faculty.php?id=<?php echo $row['id']; ?>" class="btn btn-primary">View Details</a>
-                                                        <form action="/attendance_app/admin/faculty.php?" method="POST">
+                                                        <a href="<?= $rootURL; ?>/admin/faculty.php?id=<?php echo $row['id']; ?>" class="btn btn-primary">View Details</a>
+                                                        <form action="$rootURL/admin/faculty.php?" method="POST">
                                                             <input type="hidden" name="id" id="id" value="<?php echo $row['id']; ?>" />
                                                             <button type="submit" class="btn btn-danger">Delete User</button>
                                                         </form>

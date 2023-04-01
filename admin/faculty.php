@@ -1,6 +1,7 @@
 <?php
 session_start();
-$conn = mysqli_connect('localhost', 'root', '', 'attendance_app');
+include('../../config.php');
+$conn = mysqli_connect($host, $username, $password, $database);
 if (isset($_GET['id'])) {
     if ($conn) {
         $id = $_GET['id'];
@@ -18,12 +19,12 @@ if (isset($_GET['id'])) {
         $sql = "DELETE FROM users WHERE id = '$id'";
 
         mysqli_query($conn, $sql);
-        header('location: /attendance_app/admin/faculty_management.php');
+        header("location: $rootURL/admin/faculty_management.php");
     } else {
         echo "Couldn't connect to database.";
     }
 } else {
-    header('location: /attendance_app/admin/faculty_management.php');
+    header("location: $rootURL/admin/faculty_management.php");
 }
 include('../logout.php');
 

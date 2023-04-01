@@ -1,9 +1,10 @@
 <?php
 session_start();
+include('../config.php');
 
 if (isset($_POST['submit'])) {
     if (isset($_POST['username']) && isset($_POST['password'])) {
-        $conn = mysqli_connect('localhost', 'root', '', 'attendance_app');
+        $conn = mysqli_connect($host, $username, $password, $database);
 
         if ($conn) {
             $username = $_POST['username'];
@@ -28,11 +29,11 @@ if (isset($_POST['submit'])) {
                         setcookie("logged_in", true, time() + (86400), "/"); // 86400 = 1 day
 
                         if ($role == "admin") {
-                            header('location: /attendance_app/admin/');
+                            header("location: $rootURL/admin/");
                         } else if ($role == "faculty") {
-                            header('location: /attendance_app/faculty/');
+                            header("location: $rootURL/faculty/");
                         } else {
-                            header('location: /attendance_app/student/');
+                            header("location: $rootURL/student/");
                         }
                     } else {
                         $result = array("status" => "failed", "message" => "Login failed, try again.");
@@ -69,7 +70,6 @@ if (isset($_POST['submit'])) {
                 <div class="card">
                     <div class="card-body text-center form-signin">
                         <h1 class="h3 mb-3 fw-normal">User Login</h1>
-
                         <?php if (isset($_SESSION['msg_type']) && isset($_SESSION['flash_message'])) : ?>
                             <div class="alert alert-<?php echo $_SESSION["msg_type"]; ?> alert-dismissible fade show" role="alert">
                                 <?php echo $_SESSION["flash_message"]; ?>

@@ -1,11 +1,15 @@
 <?php
+include('../../config.php');
 session_start();
-$conn = mysqli_connect('localhost', 'root', '', 'attendance_app');
+$conn = mysqli_connect($host, $username, $password, $database);
 
 if ($conn) {
-    $sql = "SELECT S.name AS student_name, P.* FROM parents P INNER JOIN users S ON P.student_id = S.id";
+    $sql = "SELECT c.*, u.first_name, u.last_name 
+          FROM classes c 
+          JOIN users u ON c.teacher_id = u.id 
+          WHERE c.status != 'deleted'";
 
-    $parent_res = mysqli_query($conn, $sql);
+    $class_res = mysqli_query($conn, $sql);
 } else {
     echo "Couldn't connect to database.";
 }
@@ -61,33 +65,41 @@ include('../logout.php');
                 <div class="col-8">
                     <div class="card shadow">
                         <div class="card-body">
+                            <?php if (isset($_SESSION['msg_type']) && isset($_SESSION['flash_message'])) : ?>
+                                <div class="alert alert-<?php echo $_SESSION["msg_type"]; ?> alert-dismissible fade show" role="alert">
+                                    <?php echo $_SESSION["flash_message"]; ?>
+                                </div>
+                            <?php endif; ?>
+                            <?php
+                            unset($_SESSION['msg_type']);
+                            unset($_SESSION['flash_message']);
+                            ?>
                             <div class="display-6">Class Management</div>
                             <div class="row mt-4">
+                                <div class="col-12 mb-4">
+                                    <a href="<?= $rootURL; ?>/admin/class_management/add_class.php" class="btn btn-success float-end">New Class</a>
+                                </div>
                                 <div class="col-12">
-
                                     <table class="table table-striped align-middle">
                                         <thead>
                                             <tr class="table-primary">
-                                                <th>Class ID</th>
                                                 <th>Class Title</th>
                                                 <th>Actions</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <!-- <?php while ($row = $parent_res->fetch_assoc()) : ?>
+                                            <?php while ($row = $class_res->fetch_assoc()) : ?>
                                                 <tr>
-                                                    <td><?php echo $row['name']; ?></td>
-                                                    <td><?php echo $row['student_name']; ?></td>
-                                                    <td><?php echo $row['email_address']; ?></td>
+                                                    <td><?php echo $row['title']; ?></td>
                                                     <td class="d-flex justify-content-evenly">
-                                                        <a href="/attendance_app/admin/faculty.php?id=<?php echo $row['id']; ?>" class="btn btn-primary">View Details</a>
-                                                        <form action="/attendance_app/admin/faculty.php?" method="POST">
+                                                        <a href="<?= $rootURL; ?>/admin/faculty.php?id=<?php echo $row['id']; ?>" class="btn btn-primary">View Details</a>
+                                                        <form action="$rootURL/admin/faculty.php?" method="POST">
                                                             <input type="hidden" name="id" id="id" value="<?php echo $row['id']; ?>" />
                                                             <button type="submit" class="btn btn-danger">Delete User</button>
                                                         </form>
                                                     </td>
                                                 </tr>
-                                            <?php endwhile; ?> -->
+                                            <?php endwhile; ?>
                                         </tbody>
                                     </table>
                                 </div>

@@ -35,7 +35,7 @@ include('../logout.php');
                             <hr class="dropdown-divider">
                         </li>
                         <li>
-                            <form method="POST"><button type="submit" name="logout" class="dropdown-item" href="#">Logout</button></form>
+                            <form method="POST"><button type="submit" name="logout" class="dropdown-item">Logout</button></form>
                         </li>
                     </ul>
                 </div>

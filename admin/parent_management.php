@@ -1,9 +1,13 @@
 <?php
+include('../../config.php');
 session_start();
-$conn = mysqli_connect('localhost', 'root', '', 'attendance_app');
+$conn = mysqli_connect($host, $username, $password, $database);
 
 if ($conn) {
-    $sql = "SELECT S.name AS student_name, P.* FROM parents P INNER JOIN users S ON P.student_id = S.id";
+    $sql = "SELECT u1.id, u1.first_name, u1.last_name, u1.role, u1.email, u2.first_name AS student_first_name, u2.last_name AS student_last_name
+          FROM users u1
+          LEFT JOIN users u2 ON u1.student_id = u2.id
+          WHERE u1.role = 'parent'";
 
     $parent_res = mysqli_query($conn, $sql);
 } else {
@@ -77,13 +81,13 @@ include('../logout.php');
                                         <tbody>
                                             <?php while ($row = $parent_res->fetch_assoc()) : ?>
                                                 <tr>
-                                                    <td><?php echo $row['name']; ?></td>
-                                                    <td><?php echo $row['student_name']; ?></td>
-                                                    <td><?php echo $row['email_address']; ?></td>
+                                                    <td><?= $row['first_name']; ?></td>
+                                                    <td><?= $row['student_first_name']; ?></td>
+                                                    <td><?= $row['email']; ?></td>
                                                     <td class="d-flex justify-content-evenly">
-                                                        <a href="/attendance_app/admin/faculty.php?id=<?php echo $row['id']; ?>" class="btn btn-primary">View Details</a>
-                                                        <form action="/attendance_app/admin/faculty.php?" method="POST">
-                                                            <input type="hidden" name="id" id="id" value="<?php echo $row['id']; ?>" />
+                                                        <a href="<?= $rootURL; ?>/admin/faculty.php?id=<?= $row['id']; ?>" class="btn btn-primary">View Details</a>
+                                                        <form action="$rootURL/admin/faculty.php?" method="POST">
+                                                            <input type="hidden" name="id" id="id" value="<?= $row['id']; ?>" />
                                                             <button type="submit" class="btn btn-danger">Delete User</button>
                                                         </form>
                                                     </td>
