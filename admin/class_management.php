@@ -9,7 +9,32 @@ if ($conn) {
           JOIN users u ON c.teacher_id = u.id 
           WHERE c.status != 'deleted'";
 
-    $class_res = mysqli_query($conn, $sql);
+    $classes_result = mysqli_query($conn, $sql);
+
+    if (isset($_POST['submit'])) {
+        if (isset($_POST['id'])) {
+            $id = $_POST['id'];
+            $sql = "SELECT * FROM classes WHERE id = '$id'";
+
+            $class_result = mysqli_query($conn, $sql);
+            $class = $class_result->fetch_assoc();
+            $class_id = $class['id'];
+
+            $sql = "UPDATE classes SET status = 'deleted' WHERE id = '$id'";
+
+            if (mysqli_query($conn, $sql)) {
+                $_SESSION['msg_type'] = 'success';
+                $_SESSION['flash_message'] = 'Class has been deleted';
+                header("Refresh: 0");
+                session_write_close();
+            } else {
+                $_SESSION['msg_type'] = 'danger';
+                $_SESSION['flash_message'] = 'Something went wrong.';
+                header("Refresh: 0");
+                session_write_close();
+            }
+        }
+    }
 } else {
     echo "Couldn't connect to database.";
 }
@@ -88,14 +113,14 @@ include('../logout.php');
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <?php while ($row = $class_res->fetch_assoc()) : ?>
+                                            <?php while ($row = $classes_result->fetch_assoc()) : ?>
                                                 <tr>
                                                     <td><?php echo $row['title']; ?></td>
                                                     <td class="d-flex justify-content-evenly">
-                                                        <a href="<?= $rootURL; ?>/admin/faculty.php?id=<?php echo $row['id']; ?>" class="btn btn-primary">View Details</a>
-                                                        <form action="$rootURL/admin/faculty.php?" method="POST">
+                                                        <a href="<?= $rootURL; ?>/admin/class_management/class.php?id=<?php echo $row['id']; ?>" class="btn btn-primary">View Details</a>
+                                                        <form method="POST" onsubmit="return confirm('Are you sure you want to remove this class? This action is permanent and cannot be undone.');">
                                                             <input type="hidden" name="id" id="id" value="<?php echo $row['id']; ?>" />
-                                                            <button type="submit" class="btn btn-danger">Delete User</button>
+                                                            <button type="submit" name="submit" class="btn btn-danger">Remove Class</button>
                                                         </form>
                                                     </td>
                                                 </tr>

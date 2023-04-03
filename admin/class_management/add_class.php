@@ -13,11 +13,13 @@ if ($conn) {
         $description = mysqli_real_escape_string($conn, $_POST['class_description']);
         $teacher_id = mysqli_real_escape_string($conn, $_POST['class_teacher']);
 
-        $sql = "INSERT INTO classes (teacher_id, title, description) VALUES ('$teacher_id', '$title', '$description');";
+        $sql = "INSERT INTO classes (teacher_id, title, description, status) VALUES ('$teacher_id', '$title', '$description', 'inactive');";
 
         if (mysqli_query($conn, $sql)) {
             $_SESSION['msg_type'] = 'success';
             $_SESSION['flash_message'] = 'Class Created';
+            header("location: $rootURL/admin/class_management.php");
+            session_write_close();
         }
     }
 } else {
