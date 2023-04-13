@@ -4,7 +4,28 @@ session_start();
 $conn = mysqli_connect($host, $username, $password, $database);
 
 if ($conn) {
-    $sql = "SELECT * FROM users WHERE role = 'student'";
+    $search_query = '';
+    $sort_query = '';
+
+    // Check if search query is submitted
+    if (isset($_GET['search'])) {
+        $search_query = $_GET['search'];
+        if (!empty($search_query)) {
+            $search_query = mysqli_real_escape_string($conn, $_GET['search']);
+            $search_query = "AND (username LIKE '%$search_query%' OR (first_name = '$search_query') OR (last_name = '$search_query'))";
+        }
+    }
+
+
+    // Check if sort query is submitted
+    if (isset($_GET['sort'])) {
+        $sort_query = $_GET['sort'];
+        if (!empty($sort_query)) {
+            $sort_query = "ORDER BY " . $_GET['sort'] . " ASC;";
+        }
+    }
+
+    $sql = "SELECT * FROM users WHERE role = 'student' $search_query $sort_query";
 
     $student_res = mysqli_query($conn, $sql);
 } else {
@@ -65,6 +86,24 @@ include('../logout.php');
                             <div class="display-6">Student Management</div>
                             <div class="row mt-4">
                                 <div class="col-12">
+                                    <form method="GET" class="mb-3">
+                                        <div class="row">
+                                            <div class="col-md-6 mb-2">
+                                                <input type="text" name="search" id="search" class="form-control" placeholder="Search by name or username" value="<?= isset($_GET['search']) ? $_GET['search'] : '' ?>" />
+                                            </div>
+                                            <div class="col-md-6">
+                                                <select name="sort" id="sort" class="form-select">
+                                                    <option value="">Sort by</option>
+                                                    <option value="last_name" <?= isset($_GET['sort']) && $_GET['sort'] == 'last_name' ? 'selected' : '' ?>>Last Name</option>
+                                                    <option value="first_name" <?= isset($_GET['sort']) && $_GET['sort'] == 'first_name' ? 'selected' : '' ?>>First Name</option>
+                                                    <option value="username" <?= isset($_GET['sort']) && $_GET['sort'] == 'username' ? 'selected' : '' ?>>Username</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-12 mt-2">
+                                                <button type="submit" class="btn btn-primary">Search and Sort</button>
+                                            </div>
+                                        </div>
+                                    </form>
 
                                     <table class="table table-striped align-middle">
                                         <thead>
