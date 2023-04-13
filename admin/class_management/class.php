@@ -14,6 +14,19 @@ if (isset($_GET['id'])) {
         $class_id = $class['id'];
         $sql = "SELECT * FROM schedules WHERE class_id = '$class_id'";
         $schedules_res = mysqli_query($conn, $sql);
+
+        if (isset($_POST['delete_schedule'])) {
+            $schedule_id = mysqli_real_escape_string($conn, $_POST['schedule_id']);
+
+            $sql = "DELETE FROM schedules WHERE id = '$schedule_id'";
+            mysqli_query($conn, $sql);
+
+            // set flash message and type
+            $_SESSION['msg_type'] = 'success';
+            $_SESSION['flash_message'] = 'Schedule Deleted';
+            header("Location: " . $_SERVER['PHP_SELF'] . "?id=$class_id");
+            session_write_close();
+        }
     } else {
         echo "Couldn't connect to database.";
     }
@@ -68,6 +81,15 @@ include('../../logout.php');
                     <?php include_once "../components/panel.php" ?>
                 </div>
                 <div class="col-8">
+                    <?php if (isset($_SESSION['msg_type']) && isset($_SESSION['flash_message'])) : ?>
+                        <div class="alert alert-<?php echo $_SESSION["msg_type"]; ?> alert-dismissible fade show" role="alert">
+                            <?php echo $_SESSION["flash_message"]; ?>
+                        </div>
+                    <?php endif; ?>
+                    <?php
+                    unset($_SESSION['msg_type']);
+                    unset($_SESSION['flash_message']);
+                    ?>
                     <div class="card shadow">
                         <div class="card-body">
                             <h3>Class Details</h3>
@@ -75,6 +97,9 @@ include('../../logout.php');
                                 <div class="col-12 mb-4">
                                     <h1><?= $class['title']; ?></h1>
                                     <p><?= $class['description']; ?></p>
+                                </div>
+                                <div class="col-12 mb-4">
+                                    <a href="<?= $rootURL; ?>/admin/class_management/add_schedule.php?id=<?= $class['id']; ?>" class="btn btn-success float-end">New Schedule</a>
                                 </div>
                                 <div class="col-12">
                                     <table class="table">
@@ -90,11 +115,14 @@ include('../../logout.php');
                                             <?php foreach ($schedules_res as $schedule) : ?>
                                                 <tr>
                                                     <td><?= $schedule['day_of_week'] ?></td>
-                                                    <td><?= $schedule['time_start'] ?></td>
-                                                    <td><?= $schedule['time_end'] ?></td>
+                                                    <td><?php echo date('h:i A', strtotime($schedule['time_start'])) ?></td>
+                                                    <td><?php echo date('h:i A', strtotime($schedule['time_end'])) ?></td>
                                                     <td>
-                                                        <button class="btn btn-primary">Edit</button>
-                                                        <button class="btn btn-danger">Delete</button>
+                                                        <a href="<?= $rootURL; ?>/admin/class_management/edit_schedule.php?id=<?= $schedule['id']; ?>" class="btn btn-primary">Edit</a>
+                                                        <form method="POST" style="display: inline-block;">
+                                                            <input type="hidden" name="schedule_id" value="<?= $schedule['id']; ?>">
+                                                            <button type="submit" name="delete_schedule" class="btn btn-danger">Delete</button>
+                                                        </form>
                                                     </td>
                                                 </tr>
                                             <?php endforeach; ?>
