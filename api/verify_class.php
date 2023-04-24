@@ -30,7 +30,7 @@ if ($result) {
     $class = mysqli_fetch_assoc($result);
     if ($class) {
         $date = date('Y-m-d');
-        $unique_string = hash('sha256', $class['id'] . $date);
+        $unique_string = base64_encode($student_id . '|' . $class['id'] . '|' . $date);
 
         // Student is currently enrolled in a class that matches the current day and time
         // Return class details as JSON response
