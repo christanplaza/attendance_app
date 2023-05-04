@@ -118,7 +118,7 @@ include('../../logout.php');
                                                     <td><?php echo date('h:i A', strtotime($schedule['time_start'])) ?></td>
                                                     <td><?php echo date('h:i A', strtotime($schedule['time_end'])) ?></td>
                                                     <td>
-                                                        <a href="<?= $rootURL; ?>/admin/class_management/edit_schedule.php?id=<?= $schedule['id']; ?>" class="btn btn-primary">Edit</a>
+                                                        <a href="<?= $rootURL; ?>/admin/class_management/edit_schedule.php?id=<?= $schedule['id']; ?>" class="btn btn-warning">Edit</a>
                                                         <form method="POST" style="display: inline-block;">
                                                             <input type="hidden" name="schedule_id" value="<?= $schedule['id']; ?>">
                                                             <button type="submit" name="delete_schedule" class="btn btn-danger">Delete</button>

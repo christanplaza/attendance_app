@@ -43,8 +43,8 @@ if (isset($_GET['id'])) {
 
             $_SESSION['msg_type'] = 'success';
             $_SESSION['flash_message'] = 'Student enrolled successfully';
-            header("location: $rootURL/admin/enrollments.php?id=" . $id);
             session_write_close();
+            header("location: $rootURL/admin/enrollments.php?id=" . $id);
         }
     } else {
         echo "Couldn't connect to database.";
@@ -102,6 +102,15 @@ include('../logout.php');
                     <?php include_once "components/panel.php" ?>
                 </div>
                 <div class="col-8">
+                    <?php if (isset($_SESSION['msg_type']) && isset($_SESSION['flash_message'])) : ?>
+                        <div class="alert alert-<?php echo $_SESSION["msg_type"]; ?> alert-dismissible fade show" role="alert">
+                            <?php echo $_SESSION["flash_message"]; ?>
+                        </div>
+                    <?php endif; ?>
+                    <?php
+                    unset($_SESSION['msg_type']);
+                    unset($_SESSION['flash_message']);
+                    ?>
                     <div class="card shadow">
                         <div class="card-header bg-secondary-subtle">Student Profile</div>
                         <div class="card-body">

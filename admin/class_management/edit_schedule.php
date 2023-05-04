@@ -25,7 +25,7 @@ if ($conn) {
         }
 
         // Prepare SQL statement and execute with form data
-        $sql = "UPDATE schedules SET day_of_week='$day_of_week', time_start='$start_time', time_end='$end_time', location='$class_location' WHERE schedule_id='$schedule_id'";
+        $sql = "UPDATE schedules SET day_of_week='$day_of_week', time_start='$start_time', time_end='$end_time', location='$class_location' WHERE id='$schedule_id'";
         mysqli_query($conn, $sql);
 
         // Redirect to class schedule page

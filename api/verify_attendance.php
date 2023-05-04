@@ -17,6 +17,8 @@ $date = $decoded_array[2];
 
 // Get current server time
 $current_time = date('H:i:s');
+// Get the current day
+$current_day = date("l");
 
 // Check if there is a class with the given ID that matches the current day and time
 $sql = "SELECT c.id, c.title, c.description, u.first_name, u.last_name
@@ -46,11 +48,65 @@ if ($result) {
 
         if ($result && mysqli_num_rows($result) > 0) {
             // Student is enrolled in the class with the given ID and the class schedule matches the current day and time
-            $response = array(
-                'status' => 'success',
-                'message' => 'QR code verification successful.',
-                'class' => $class
-            );
+
+            // Get the Schedule
+            // Fetch the schedule that matches the current time and date
+            $sql = "SELECT * FROM schedules WHERE class_id = $class_id AND day_of_week = DAYNAME(CURRENT_DATE()) AND '$current_time' BETWEEN time_start AND time_end";
+            $result = mysqli_query($conn, $sql);
+
+            if (!$result) {
+                $response = array(
+                    'status' => 'error',
+                    'message' => 'Schedule not found.',
+                );
+            } else {
+                // Check if a schedule was found
+                if ($result->num_rows > 0) {
+                    $schedule = $result->fetch_assoc();
+                    $schedule_id = $schedule["id"];
+
+                    $sql = "SELECT * FROM attendance WHERE student_id = $student_id AND class_id = $class_id AND schedule_id = $schedule_id AND DAYNAME(created_at) = '$current_day'";
+                    $result = mysqli_query($conn, $sql);
+
+                    // Check for errors
+                    if (!$result) {
+                        $response = array(
+                            'status' => 'error',
+                            'message' => 'Error verifying attendance.'
+                        );
+                    } else {
+                        // Check if an attendance record already exists
+                        if ($result->num_rows > 0) {
+                            $response = array(
+                                'status' => 'success',
+                                'message' => 'QR already used.'
+                            );
+                        } else {
+                            $sql = "INSERT INTO attendance (student_id, class_id, schedule_id) VALUES ($student_id, $class_id, $schedule_id)";
+                            $result = mysqli_query($conn, $sql);
+
+                            // Check for errors
+                            if (!$result) {
+                                $response = array(
+                                    'status' => 'error',
+                                    'message' => 'Error verifying attendance.'
+                                );
+                            } else {
+                                $response = array(
+                                    'status' => 'success',
+                                    'message' => 'QR Valid.',
+                                    'class' => $class
+                                );
+                            }
+                        }
+                    }
+                } else {
+                    $response = array(
+                        'status' => 'error',
+                        'message' => 'Schedule not found.',
+                    );
+                }
+            }
         } else {
             // Student is not enrolled in the class with the given ID or the enrollment has ended or is inactive
             $response = array(

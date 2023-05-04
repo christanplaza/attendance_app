@@ -116,9 +116,10 @@ include('../logout.php');
                                             <?php while ($row = $classes_result->fetch_assoc()) : ?>
                                                 <tr>
                                                     <td><?php echo $row['title']; ?></td>
-                                                    <td class="d-flex justify-content-evenly">
-                                                        <a href="<?= $rootURL; ?>/admin/class_management/class.php?id=<?php echo $row['id']; ?>" class="btn btn-primary">View Details</a>
-                                                        <form method="POST" onsubmit="return confirm('Are you sure you want to remove this class? This action is permanent and cannot be undone.');">
+                                                    <td>
+                                                        <a href="<?= $rootURL; ?>/admin/class_management/class.php?id=<?php echo $row['id']; ?>" class="btn btn-primary mx-2">View Details</a>
+                                                        <a href="<?= $rootURL; ?>/admin/class_management/edit_class.php?id=<?= $row['id']; ?>" class="btn btn-warning mx-2">Edit</a>
+                                                        <form method="POST" style="display: inline-block;" onsubmit="return confirm('Are you sure you want to remove this class? This action is permanent and cannot be undone.');">
                                                             <input type="hidden" name="id" id="id" value="<?php echo $row['id']; ?>" />
                                                             <button type="submit" name="submit" class="btn btn-danger">Remove Class</button>
                                                         </form>
