@@ -24,27 +24,6 @@ if (mysqli_num_rows($result) > 0) {
             'status' => 'null'
         );
     }
-
-
-    // $sql = "SELECT COUNT(*) as cnt FROM users WHERE student_id = '$student_id'";
-    // $result = mysqli_query($conn, $sql);
-    // $student_count = mysqli_fetch_assoc($result);
-
-    // if ($student_count['cnt'] > 0) {
-    //     // Student is already paired with a parent, return error message
-    //     $response = array(
-    //         'status' => 'warning',
-    //         'message' => 'Student is already paired with a parent',
-    //         'student' => $row
-    //     );
-    // } else {
-    //     // Return success message
-    //     $response = array(
-    //         'status' => 'success',
-    //         'message' => 'Valid Student Code',
-    //         'student' => $row
-    //     );
-    // }
 } else {
     // Return error message if no student was found
     $response = array(
