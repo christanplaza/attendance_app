@@ -25,8 +25,8 @@
                 </a>
             </div>
             <div class="col-12">
-                <a href="<?= $rootURL; ?>/admin/admin_logs.php" class="btn btn-primary btn-lg w-100">
-                    Admin Logs
+                <a href="<?= $rootURL; ?>/admin/attendance_logs.php" class="btn btn-primary btn-lg w-100">
+                    Attendance Logs
                 </a>
             </div>
         </div>

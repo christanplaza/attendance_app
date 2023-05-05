@@ -14,8 +14,7 @@ if (isset($_POST['submit'])) {
             $role = 'student';
 
             if ($conn) {
-
-                $sql = "SELECT * FROM users WHERE username = '$useranme'";
+                $sql = "SELECT * FROM users WHERE username = '$username'";
 
                 $res = mysqli_query($conn, $sql);
 
@@ -25,11 +24,22 @@ if (isset($_POST['submit'])) {
                     $sql = "INSERT into users (first_name, last_name, role, username, password) values ('$first_name', '$last_name', '$role', '$username', '$password')";
 
                     if (mysqli_query($conn, $sql)) {
+                        $user_id = mysqli_insert_id($conn);
+
+                        // concatenate user ID and name
+                        $name = $user_id . $last_name . $first_name;
+
+                        // Generate a unique code using md5 and the user info
+                        $unique_code = substr(md5($name), 0, 6);
+
+                        // Update the user row with the unique code
+                        $sql = "UPDATE users SET unique_code = '$unique_code' WHERE id = $user_id";
+
+                        mysqli_query($conn, $sql);
+
                         $result = array("status" => "success", "message" => "Account Created");
                     } else {
                         $result = array("status" => "danger", "message" => "Registration Failed");
-                        echo "hit";
-                        die();
                     }
                 }
             } else {
