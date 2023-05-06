@@ -25,7 +25,6 @@ if (isset($_GET['sort'])) {
     }
 }
 
-
 $sql = "SELECT DATE_FORMAT(a.created_at, '%m/%d/%Y') AS created_at_short, CONCAT_WS(', ', s.last_name, s.first_name) AS student_name, c.title, CONCAT_WS(', ', t.last_name, t.first_name) AS teacher_name, CONCAT_WS(' ', DAYNAME(sc.time_start), TIME_FORMAT(sc.time_start, '%h:%i%p'), '-', TIME_FORMAT(sc.time_end, '%h:%i%p')) AS schedule_time 
         FROM attendance a 
         JOIN users s ON a.student_id = s.id 

@@ -7,6 +7,25 @@ if ($conn) {
     $sql = "SELECT * FROM users WHERE role = 'faculty'";
 
     $faculty_res = mysqli_query($conn, $sql);
+
+    if (isset($_POST['submit'])) {
+        if (isset($_POST['id'])) {
+            $id = $_POST['id'];
+            $sql = "DELETE FROM users WHERE id = '$id'";
+
+            if (mysqli_query($conn, $sql)) {
+                $_SESSION['msg_type'] = 'success';
+                $_SESSION['flash_message'] = 'Faculty has been removed';
+                header("Refresh: 0");
+                session_write_close();
+            } else {
+                $_SESSION['msg_type'] = 'danger';
+                $_SESSION['flash_message'] = 'Something went wrong.';
+                header("Refresh: 0");
+                session_write_close();
+            }
+        }
+    }
 } else {
     echo "Couldn't connect to database.";
 }
@@ -62,10 +81,21 @@ include('../logout.php');
                 <div class="col-8">
                     <div class="card shadow">
                         <div class="card-body">
+                            <?php if (isset($_SESSION['msg_type']) && isset($_SESSION['flash_message'])) : ?>
+                                <div class="alert alert-<?php echo $_SESSION["msg_type"]; ?> alert-dismissible fade show" role="alert">
+                                    <?php echo $_SESSION["flash_message"]; ?>
+                                </div>
+                            <?php endif; ?>
+                            <?php
+                            unset($_SESSION['msg_type']);
+                            unset($_SESSION['flash_message']);
+                            ?>
                             <div class="display-6">Faculty Management</div>
                             <div class="row mt-4">
+                                <div class="col-12 mb-4">
+                                    <a href="<?= $rootURL; ?>/admin/faculty_management/add_faculty.php" class="btn btn-success float-end">New Faculty</a>
+                                </div>
                                 <div class="col-12">
-
                                     <table class="table table-striped align-middle">
                                         <thead>
                                             <tr class="table-primary">
@@ -83,9 +113,9 @@ include('../logout.php');
                                                     <td><?php echo $row['username']; ?></td>
                                                     <td class="d-flex justify-content-evenly">
                                                         <a href="<?= $rootURL; ?>/admin/faculty.php?id=<?php echo $row['id']; ?>" class="btn btn-primary">View Details</a>
-                                                        <form action="$rootURL/admin/faculty.php?" method="POST">
+                                                        <form method="POST" style="display: inline-block;" onsubmit="return confirm('Are you sure you want to remove this user? This action is permanent and cannot be undone.');">
                                                             <input type="hidden" name="id" id="id" value="<?php echo $row['id']; ?>" />
-                                                            <button type="submit" class="btn btn-danger">Delete User</button>
+                                                            <button type="submit" name="submit" class="btn btn-danger">Remove User</button>
                                                         </form>
                                                     </td>
                                                 </tr>

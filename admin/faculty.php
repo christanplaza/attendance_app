@@ -81,24 +81,16 @@ include('../logout.php');
                         <div class="card-body">
                             <table class="table">
                                 <tr>
-                                    <td>Name</td>
-                                    <td><?php echo $user['name']; ?></td>
+                                    <td>First Name</td>
+                                    <td><?php echo $user['first_name']; ?></td>
+                                </tr>
+                                <tr>
+                                    <td>Last Name</td>
+                                    <td><?php echo $user['last_name']; ?></td>
                                 </tr>
                                 <tr>
                                     <td>Username</td>
                                     <td><?php echo $user['username']; ?></td>
-                                </tr>
-                                <tr>
-                                    <td>Age</td>
-                                    <td><?php echo $user['age']; ?></td>
-                                </tr>
-                                <tr>
-                                    <td>Gender</td>
-                                    <td><?php echo $user['gender']; ?></td>
-                                </tr>
-                                <tr>
-                                    <td>Address</td>
-                                    <td><?php echo $user['address']; ?></td>
                                 </tr>
                             </table>
                         </div>
