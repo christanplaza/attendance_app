@@ -5,6 +5,10 @@ $conn = mysqli_connect($host, $username, $password, $database);
 
 if (isset($_GET['id'])) {
     $id = $_GET['id'];
+
+    $sql = "SELECT DATE_FORMAT(el.created_at, '%m/%d/%Y') AS created_at_short, el.*, CONCAT_WS(', ', s.last_name, s.first_name) AS student_name FROM excuse_letters el JOIN users s ON el.student_id = s.id WHERE el.class_id = '$id'";
+    $excuse_letters_res = mysqli_query($conn, $sql);
+
     if ($conn) {
         $sql = "SELECT * FROM classes WHERE id = '$id'";
 
@@ -81,51 +85,89 @@ include('../../logout.php');
                     <?php include_once "../components/panel.php" ?>
                 </div>
                 <div class="col-8">
-                    <?php if (isset($_SESSION['msg_type']) && isset($_SESSION['flash_message'])) : ?>
-                        <div class="alert alert-<?php echo $_SESSION["msg_type"]; ?> alert-dismissible fade show" role="alert">
-                            <?php echo $_SESSION["flash_message"]; ?>
+                    <div class="row">
+                        <div class="col-12 mb-4">
+                            <?php if (isset($_SESSION['msg_type']) && isset($_SESSION['flash_message'])) : ?>
+                                <div class="alert alert-<?php echo $_SESSION["msg_type"]; ?> alert-dismissible fade show" role="alert">
+                                    <?php echo $_SESSION["flash_message"]; ?>
+                                </div>
+                            <?php endif; ?>
+                            <?php
+                            unset($_SESSION['msg_type']);
+                            unset($_SESSION['flash_message']);
+                            ?>
+                            <div class="card shadow">
+                                <div class="card-body">
+                                    <h3>Class Details</h3>
+                                    <div class="row mt-4">
+                                        <div class="col-12 mb-4">
+                                            <h1><?= $class['title']; ?></h1>
+                                            <p><?= $class['description']; ?></p>
+                                        </div>
+                                        <div class="col-12 mb-4">
+                                            <a href="<?= $rootURL; ?>/faculty/class_management/add_schedule.php?id=<?= $class['id']; ?>" class="btn btn-success float-end">New Schedule</a>
+                                        </div>
+                                        <div class="col-12">
+                                            <table class="table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Day of Week</th>
+                                                        <th>Start Time</th>
+                                                        <th>End Time</th>
+                                                        <th>Actions</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <?php foreach ($schedules_res as $schedule) : ?>
+                                                        <tr>
+                                                            <td><?= $schedule['day_of_week'] ?></td>
+                                                            <td><?php echo date('h:i A', strtotime($schedule['time_start'])) ?></td>
+                                                            <td><?php echo date('h:i A', strtotime($schedule['time_end'])) ?></td>
+                                                            <td>
+                                                                <a href="<?= $rootURL; ?>/faculty/class_management/edit_schedule.php?id=<?= $schedule['id']; ?>" class="btn btn-warning">Edit</a>
+                                                                <form method="POST" style="display: inline-block;">
+                                                                    <input type="hidden" name="schedule_id" value="<?= $schedule['id']; ?>">
+                                                                    <button type="submit" name="delete_schedule" class="btn btn-danger">Delete</button>
+                                                                </form>
+                                                            </td>
+                                                        </tr>
+                                                    <?php endforeach; ?>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    <?php endif; ?>
-                    <?php
-                    unset($_SESSION['msg_type']);
-                    unset($_SESSION['flash_message']);
-                    ?>
-                    <div class="card shadow">
-                        <div class="card-body">
-                            <h3>Class Details</h3>
-                            <div class="row mt-4">
-                                <div class="col-12 mb-4">
-                                    <h1><?= $class['title']; ?></h1>
-                                    <p><?= $class['description']; ?></p>
-                                </div>
-                                <div class="col-12 mb-4">
-                                    <a href="<?= $rootURL; ?>/faculty/class_management/add_schedule.php?id=<?= $class['id']; ?>" class="btn btn-success float-end">New Schedule</a>
-                                </div>
-                                <div class="col-12">
-                                    <table class="table">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <table class="table table-striped">
                                         <thead>
                                             <tr>
-                                                <th>Day of Week</th>
-                                                <th>Start Time</th>
-                                                <th>End Time</th>
-                                                <th>Actions</th>
+                                                <th scope="col">Date Created</th>
+                                                <th scope="col">Student Name</th>
+                                                <th scope="col">Note</th>
+                                                <th scope="col">Actions</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <?php foreach ($schedules_res as $schedule) : ?>
+                                            <?php
+                                            // Fetch the results and print them in a table row
+                                            while ($row = $excuse_letters_res->fetch_assoc()) {
+                                                $student_name = $row["student_name"];
+                                            ?>
                                                 <tr>
-                                                    <td><?= $schedule['day_of_week'] ?></td>
-                                                    <td><?php echo date('h:i A', strtotime($schedule['time_start'])) ?></td>
-                                                    <td><?php echo date('h:i A', strtotime($schedule['time_end'])) ?></td>
+                                                    <td><?= $row["created_at_short"] ?></td>
+                                                    <td><?= $student_name ?></td>
+                                                    <td><?= $row['note'] ?></td>
                                                     <td>
-                                                        <a href="<?= $rootURL; ?>/faculty/class_management/edit_schedule.php?id=<?= $schedule['id']; ?>" class="btn btn-warning">Edit</a>
-                                                        <form method="POST" style="display: inline-block;">
-                                                            <input type="hidden" name="schedule_id" value="<?= $schedule['id']; ?>">
-                                                            <button type="submit" name="delete_schedule" class="btn btn-danger">Delete</button>
-                                                        </form>
+                                                        <a href="<?= $rootURL; ?>/faculty/class_management/excuse_letter.php?id=<?= $row['id']; ?>" class="btn btn-primary">View Details</a>
                                                     </td>
                                                 </tr>
-                                            <?php endforeach; ?>
+                                            <?php
+                                            }
+                                            ?>
                                         </tbody>
                                     </table>
                                 </div>
