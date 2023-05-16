@@ -171,7 +171,6 @@ include('../logout.php');
                                         <h5 class="card-title"><?= $row['title'] ?></h5>
                                         <h6 class="card-subtitle mb-2 text-muted"><?= $row['first_name'] . ' ' . $row['last_name'] ?></h6>
                                         <p class="card-text"><?= $row['description'] ?></p>
-                                        <p class="card-text"><strong>Grade: </strong><?= $row['grade'] ?></p>
                                         <p class="card-text"><strong>Enrollment End: </strong><?= $row['enrollment_end'] ?></p>
                                         <a href="<?= $rootURL; ?>/admin/class_management/class.php?id=<?= $row['class_id']; ?>" class="card-link">View Class Details</a>
                                     </div>

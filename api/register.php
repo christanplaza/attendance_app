@@ -7,7 +7,7 @@ $conn = mysqli_connect($host, $username, $password, $database);
 $first_name = mysqli_real_escape_string($conn, $_POST['first_name']);
 $last_name = mysqli_real_escape_string($conn, $_POST['last_name']);
 $username = mysqli_real_escape_string($conn, $_POST['username']);
-$email = mysqli_real_escape_string($conn, $_POST['email']);
+$phone_number = mysqli_real_escape_string($conn, $_POST['phone_number']);
 $password = md5(mysqli_real_escape_string($conn, $_POST['password'])); // Hash the password
 $role = mysqli_real_escape_string($conn, $_POST['role']);
 
@@ -29,7 +29,7 @@ if (mysqli_num_rows($result) > 0) {
     }
 
     // Insert new user to database
-    $sql = "INSERT INTO users (first_name, last_name, username, email, password, role, unique_code) VALUES ('$first_name', '$last_name', '$username', '$email', '$password', '$role', '$unique_code')";
+    $sql = "INSERT INTO users (first_name, last_name, username, phone_number, password, role, unique_code) VALUES ('$first_name', '$last_name', '$username', '$phone_number', '$password', '$role', '$unique_code')";
     if (mysqli_query($conn, $sql)) {
         $response = array(
             'status' => 'success',

@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $hashed_password = md5($password);
 
         $conn = connect();
-        $stmt = $conn->prepare('SELECT id, role, password FROM users WHERE username = ?');
+        $stmt = $conn->prepare('SELECT id, first_name, last_name, role, password FROM users WHERE username = ?');
         $stmt->bind_param('s', $username);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -25,6 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             if ($hashed_password == $user['password']) {
                 $response['success'] = true;
                 $response['id'] = $user['id'];
+                $response['name'] = $user['first_name'] . " " . $user['last_name'];
                 $response['userRole'] = $user['role'];
                 $response['message'] = "Login successful";
             } else {

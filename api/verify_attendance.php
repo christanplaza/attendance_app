@@ -3,6 +3,36 @@ include('../../config.php');
 date_default_timezone_set('Asia/Singapore');
 $conn = mysqli_connect($host, $username, $password, $database);
 
+// Usage example
+$url = "https://api.semaphore.co/api/v4/messages";
+
+function sendPostRequest($url, $postData)
+{
+    // Create a new cURL resource
+    $curl = curl_init();
+
+    // Set the URL and options
+    curl_setopt($curl, CURLOPT_URL, $url);
+    curl_setopt($curl, CURLOPT_POST, true);
+    curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query($postData));
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+
+    // Execute the request
+    $response = curl_exec($curl);
+
+    // Close cURL resource
+    curl_close($curl);
+
+    // Handle the response
+    if ($response === false) {
+        // Request failed
+        echo "Error: " . curl_error($curl);
+    } else {
+        // Request succeeded
+        echo "Response: " . $response;
+    }
+}
+
 // Get unique string from API request
 $unique_string = $_POST['unique_string'];
 
@@ -92,6 +122,36 @@ if ($result) {
                                     'message' => 'Error verifying attendance.'
                                 );
                             } else {
+                                $sql = "SELECT * FROM users WHERE student_id = '$student_id' LIMIT 1";
+                                $result = mysqli_query($conn, $sql);
+                                if (mysqli_num_rows($result) > 0) {
+                                    $sql = "SELECT * FROM users WHERE id = '$student_id' LIMIT 1";
+                                    $result = mysqli_query($conn, $sql);
+                                    if (mysqli_num_rows($result) > 0) {
+                                        $parent = $result->fetch_assoc();
+                                        $last_name = $parent['last_name'];
+                                        $sql = "SELECT * FROM users WHERE id = '$student_id' LIMIT 1";
+                                        $student_res = mysqli_query($conn, $sql);
+                                        $student = $student_res->fetch_assoc();
+                                        $first_name = $student['first_name'];
+                                        $class_title = $class['title'];
+                                        $time = date('h:i A');
+
+                                        $msg = "Good day Mrs/Mr. $last_name, \n";
+                                        $msg .= "$first_name has logged-in for his/her $class_title class at $time.\n";
+                                        $msg .= "Thank you! This is a generated text; there is no need to reply.";
+
+
+                                        $postData = array(
+                                            'apikey' => $apiKey,
+                                            'number' => $parent['phone_number'],
+                                            'message' => $msg
+                                        );
+
+                                        sendPostRequest($url, $postData);
+                                    }
+                                }
+
                                 $response = array(
                                     'status' => 'success',
                                     'message' => 'QR Valid.',
