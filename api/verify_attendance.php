@@ -82,7 +82,7 @@ if ($result) {
                                 'message' => 'QR already used.'
                             );
                         } else {
-                            $sql = "INSERT INTO attendance (student_id, class_id, schedule_id) VALUES ($student_id, $class_id, $schedule_id)";
+                            $sql = "INSERT INTO attendance (student_id, class_id, schedule_id, status) VALUES ($student_id, $class_id, $schedule_id, 'present')";
                             $result = mysqli_query($conn, $sql);
 
                             // Check for errors

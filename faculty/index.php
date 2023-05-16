@@ -10,6 +10,7 @@ include('../logout.php');
 
 <head>
     <?php include_once "../components/header.php"; ?>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <title>Attendance App | Admin</title>
 </head>
 
@@ -51,9 +52,23 @@ include('../logout.php');
                     <?php include_once "components/panel.php" ?>
                 </div>
                 <div class="col-8">
+                    <?php if (isset($_SESSION['msg_type']) && isset($_SESSION['flash_message'])) : ?>
+                        <div class="alert alert-<?php echo $_SESSION["msg_type"]; ?> alert-dismissible fade show" role="alert">
+                            <?php echo $_SESSION["flash_message"]; ?>
+                        </div>
+                    <?php endif; ?>
+                    <?php
+                    unset($_SESSION['msg_type']);
+                    unset($_SESSION['flash_message']);
+                    ?>
                     <div class="card shadow">
                         <div class="card-body">
                             <div class="display-6">Homepage</div>
+                            <div class="row mt-4">
+                                <div class="col-6">
+                                    <a href="<?= $rootURL; ?>/faculty/announcement.php" class="btn btn-warning btn-lg"><i class="bi bi-megaphone"></i> Create an announcement</a>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

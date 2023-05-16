@@ -12,8 +12,9 @@ if ($conn) {
         $title = mysqli_real_escape_string($conn, $_POST['class_title']);
         $description = mysqli_real_escape_string($conn, $_POST['class_description']);
         $teacher_id = mysqli_real_escape_string($conn, $_POST['class_teacher']);
+        $class_limits = mysqli_real_escape_string($conn, $_POST['class_limits']);
 
-        $sql = "INSERT INTO classes (teacher_id, title, description, status) VALUES ('$teacher_id', '$title', '$description', 'inactive');";
+        $sql = "INSERT INTO classes (teacher_id, title, description, status, absence_limit) VALUES ('$teacher_id', '$title', '$description', 'inactive', '$class_limits');";
 
         if (mysqli_query($conn, $sql)) {
             $_SESSION['msg_type'] = 'success';
@@ -96,6 +97,10 @@ include('../../logout.php');
                                                 <option value="<?= $faculty['id']; ?>"><?= $faculty['last_name']; ?>, <?= $faculty['first_name']; ?></option>
                                             <?php endwhile; ?>
                                         </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="class_limits" class="form-label">Absence Limits (Number of Absences allowed before dropping)</label>
+                                        <input type="number" name="class_limits" id="class_limits" class="form-control" required min="1" pattern="[1-9]\d*">
                                     </div>
                                     <button type="submit" name="submit" class="btn btn-success float-end">Create</button>
                                 </form>

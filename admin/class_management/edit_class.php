@@ -110,6 +110,10 @@ include('../../logout.php');
                                             <option value="archived" <?= ($class_data['status'] == 'archived') ? 'selected' : ''; ?>>Archived</option>
                                         </select>
                                     </div>
+                                    <div class="mb-3">
+                                        <label for="class_limits" class="form-label">Absence Limits (Number of Absences allowed before dropping)</label>
+                                        <input type="number" name="class_limits" id="class_limits" class="form-control" required min="1" pattern="[1-9]\d*" value="<?= $class_data['absence_limit'] ?>">
+                                    </div>
                                     <button type="submit" name="submit" class="btn btn-success float-end">Update</button>
                                 </form>
                             </div>
