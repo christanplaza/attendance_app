@@ -32,6 +32,8 @@ if (isset($_POST['submit'])) {
                             header("location: $rootURL/admin/");
                         } else if ($role == "faculty") {
                             header("location: $rootURL/faculty/");
+                        } else if ($role == "parent") {
+                            header("location: $rootURL/parent/");
                         } else {
                             header("location: $rootURL/student/");
                         }

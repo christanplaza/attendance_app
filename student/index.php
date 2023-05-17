@@ -9,7 +9,7 @@ include('../logout.php');
 
 <head>
     <?php include_once "../components/header.php"; ?>
-    <title>Attendance App | Admin</title>
+    <title>Attendance App | Student</title>
 </head>
 
 <body>
