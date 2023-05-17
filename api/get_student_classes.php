@@ -33,7 +33,6 @@ if (mysqli_num_rows($result) > 0) {
     $response = array(
         'status' => 'success',
         'classes' => $classes,
-        'sql' => $sql
     );
 } else {
     // Return error message if no parent was found
