@@ -32,7 +32,7 @@ if (isset($_GET['id'])) {
         }
     }
 
-    $sql = "SELECT DATE_FORMAT(a.created_at, '%m/%d/%Y %h:%i %p') AS created_at_short, CONCAT_WS(', ', s.last_name, s.first_name) AS student_name, c.title, CONCAT_WS(', ', t.last_name, t.first_name) AS teacher_name, CONCAT_WS(' ', DAYNAME(sc.time_start), TIME_FORMAT(sc.time_start, '%h:%i%p'), '-', TIME_FORMAT(sc.time_end, '%h:%i%p')) AS schedule_time, a.status as status 
+    $sql = "SELECT DATE_FORMAT(a.created_at, '%m/%d/%Y %h:%i %p') AS created_at_short, CONCAT_WS(', ', s.last_name, s.first_name) AS student_name, s.id as student_id, c.title, CONCAT_WS(', ', t.last_name, t.first_name) AS teacher_name, CONCAT_WS(' ', DAYNAME(sc.time_start), TIME_FORMAT(sc.time_start, '%h:%i%p'), '-', TIME_FORMAT(sc.time_end, '%h:%i%p')) AS schedule_time, a.status as status 
         FROM attendance a 
         JOIN users s ON a.student_id = s.id 
         JOIN classes c ON a.class_id = c.id 
@@ -245,10 +245,13 @@ include('../../logout.php');
                                                 <table class="table table-striped mt-5">
                                                     <thead>
                                                         <tr>
+                                                            <th scope="col">Schedule Time</th>
                                                             <th scope="col">Date Created</th>
                                                             <th scope="col">Student Name</th>
                                                             <th scope="col">Status</th>
-                                                            <th scope="col">Schedule Time</th>
+                                                            <th scope="col">Present</th>
+                                                            <th scope="col">Absent</th>
+                                                            <td></td>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -256,14 +259,30 @@ include('../../logout.php');
                                                         // Fetch the results and print them in a table row
                                                         while ($row = $result->fetch_assoc()) {
                                                             $student_name = $row["student_name"];
+                                                            $student_id = $row['student_id'];
                                                             $title = $row["title"];
                                                             $teacher_name = $row["teacher_name"];
                                                             $status = $row["status"];
                                                             $schedule_time = $row["schedule_time"];
+
+                                                            $sql = "SELECT 
+                                                                    SUM(CASE WHEN a.status = 'absent' THEN 1 ELSE 0 END) AS absent_count,
+                                                                    SUM(CASE WHEN a.status = 'present' THEN 1 ELSE 0 END) AS present_count
+                                                                FROM 
+                                                                    attendance a
+                                                                JOIN 
+                                                                    classes c ON a.class_id = c.id
+                                                                WHERE 
+                                                                    a.student_id = '$student_id' 
+                                                                    AND c.id = '$class_id'";
+
+                                                            $attendance_status_count_res = mysqli_query($conn, $sql);
+                                                            $attendance_status_count = mysqli_fetch_assoc($attendance_status_count_res);
                                                         ?>
                                                             <tr>
+                                                                <td><?= $schedule_time ?></td>
                                                                 <td><?= $row["created_at_short"] ?></td>
-                                                                <td><?= $student_name ?></td>
+                                                                <td><a href="<?= $rootURL ?>/faculty/attendance_status.php?id=<?= $row['student_id'] ?>&class_id=<?= $id ?>"><?= $student_name ?></a></td>
                                                                 <td>
                                                                     <?php if ($status === 'present') : ?>
                                                                         <span class="badge bg-success">Present</span>
@@ -273,7 +292,12 @@ include('../../logout.php');
                                                                         <span class="badge bg-warning text-dark">Excused</span>
                                                                     <?php endif; ?>
                                                                 </td>
-                                                                <td><?= $schedule_time ?></td>
+                                                                <td>
+                                                                    <?= $attendance_status_count['present_count']; ?>
+                                                                </td>
+                                                                <td>
+                                                                    <?= $attendance_status_count['absent_count']; ?>
+                                                                </td>
                                                             </tr>
                                                         <?php
                                                         }
