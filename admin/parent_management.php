@@ -4,7 +4,7 @@ session_start();
 $conn = mysqli_connect($host, $username, $password, $database);
 
 if ($conn) {
-    $sql = "SELECT u1.id, u1.first_name, u1.last_name, u1.role, u1.email, u2.first_name AS student_first_name, u2.last_name AS student_last_name
+    $sql = "SELECT u1.id, u1.first_name, u1.last_name, u1.role, u1.phone_number, u2.first_name AS student_first_name, u2.last_name AS student_last_name
           FROM users u1
           LEFT JOIN users u2 ON u1.student_id = u2.id
           WHERE u1.role = 'parent'";
@@ -74,7 +74,7 @@ include('../logout.php');
                                             <tr class="table-primary">
                                                 <th>Parent Name</th>
                                                 <th>Student Name</th>
-                                                <th>Email</th>
+                                                <th>Phone Number</th>
                                                 <th>Actions</th>
                                             </tr>
                                         </thead>
@@ -83,7 +83,7 @@ include('../logout.php');
                                                 <tr>
                                                     <td><?= $row['first_name']; ?></td>
                                                     <td><?= $row['student_first_name']; ?></td>
-                                                    <td><?= $row['email']; ?></td>
+                                                    <td><?= $row['phone_number']; ?></td>
                                                     <td class="d-flex justify-content-evenly">
                                                         <a href="<?= $rootURL; ?>/admin/faculty.php?id=<?= $row['id']; ?>" class="btn btn-primary">View Details</a>
                                                         <form action="$rootURL/admin/faculty.php?" method="POST">
