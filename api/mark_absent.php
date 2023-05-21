@@ -99,10 +99,10 @@ if ($result) {
                     $student = $student_res->fetch_assoc();
                     $first_name = $student['first_name'];
                     $class_title = $class['title'];
-                    $time = date('h:i A');
+                    $date_time = date('m-d-Y h:i A');
 
                     $msg = "Good day Mrs/Mr. $last_name, \n";
-                    $msg .= "$first_name has been marked absent for his/her $class_title class at $time.\n";
+                    $msg .= "$first_name has been marked absent for his/her $class_title class at $date_time.\n";
                     $msg .= "Thank you! This is a generated text; there is no need to reply.";
 
                     $postData = array(
