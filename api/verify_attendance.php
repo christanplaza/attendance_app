@@ -125,31 +125,36 @@ if ($result) {
                                 $sql = "SELECT * FROM users WHERE student_id = '$student_id' LIMIT 1";
                                 $result = mysqli_query($conn, $sql);
                                 if (mysqli_num_rows($result) > 0) {
+                                    $parent = $result->fetch_assoc();
+                                    $last_name = $parent['last_name'];
                                     $sql = "SELECT * FROM users WHERE id = '$student_id' LIMIT 1";
-                                    $result = mysqli_query($conn, $sql);
-                                    if (mysqli_num_rows($result) > 0) {
-                                        $parent = $result->fetch_assoc();
-                                        $last_name = $parent['last_name'];
-                                        $sql = "SELECT * FROM users WHERE id = '$student_id' LIMIT 1";
-                                        $student_res = mysqli_query($conn, $sql);
-                                        $student = $student_res->fetch_assoc();
-                                        $first_name = $student['first_name'];
-                                        $class_title = $class['title'];
-                                        $time = date('h:i A');
+                                    $student_res = mysqli_query($conn, $sql);
+                                    $student = $student_res->fetch_assoc();
+                                    $first_name = $student['first_name'];
+                                    $class_title = $class['title'];
+                                    $time = date('h:i A');
 
-                                        $msg = "Good day Mrs/Mr. $last_name, \n";
-                                        $msg .= "$first_name has logged-in for his/her $class_title class at $time.\n";
-                                        $msg .= "Thank you! This is a generated text; there is no need to reply.";
+                                    $msg = "Good day Mrs/Mr. $last_name, \n";
+                                    $msg .= "$first_name has logged-in for his/her $class_title class at $time.\n";
+                                    $msg .= "Thank you! This is a generated text; there is no need to reply.";
 
 
-                                        $postData = array(
-                                            'apikey' => $apiKey,
-                                            'number' => $parent['phone_number'],
-                                            'message' => $msg
-                                        );
+                                    $postData = array(
+                                        'apikey' => $apiKey,
+                                        'number' => $parent['phone_number'],
+                                        'message' => $msg
+                                    );
 
-                                        sendPostRequest($url, $postData);
-                                    }
+                                    $response = array(
+                                        'postData' => $postData,
+                                        'parent' => $parent,
+                                        'student' => $student
+                                    );
+
+                                    header('Content-Type: application/json');
+                                    echo json_encode($response);
+                                    exit();
+                                    sendPostRequest($url, $postData);
                                 }
 
                                 $response = array(

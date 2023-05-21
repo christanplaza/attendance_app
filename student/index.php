@@ -9,13 +9,13 @@ include('../logout.php');
 
 <head>
     <?php include_once "../components/header.php"; ?>
-    <title>Attendance App | Student</title>
+    <title>USLS HEU ATTENDANCE MONITORING APP | Student</title>
 </head>
 
 <body>
     <nav class="navbar navbar-expand-lg bg-body-tertiary shadow-lg">
         <div class="container">
-            <a class="navbar-brand" href="#">Attendance App</a>
+            <a class="navbar-brand" href="#">USLS HEU ATTENDANCE MONITORING APP</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>

@@ -60,7 +60,7 @@ include('../logout.php');
 
 <head>
     <?php include_once "../components/header.php"; ?>
-    <title>Attendance App | Parent</title>
+    <title>USLS HEU ATTENDANCE MONITORING APP | Parent</title>
 </head>
 
 <body>

@@ -18,6 +18,7 @@ if ($conn) {
         $description = mysqli_real_escape_string($conn, $_POST['class_description']);
         $teacher_id = mysqli_real_escape_string($conn, $_POST['class_teacher']);
         $status = mysqli_real_escape_string($conn, $_POST['class_status']);
+        $status = mysqli_real_escape_string($conn, $_POST['class_status']);
 
         $sql = "UPDATE classes SET teacher_id = '$teacher_id', title = '$title', description = '$description', status = '$status' WHERE id = '$class_id';";
 
@@ -40,13 +41,13 @@ include('../../logout.php');
 
 <head>
     <?php include_once "../../components/header.php"; ?>
-    <title>Attendance App | Admin</title>
+    <title>USLS HEU ATTENDANCE MONITORING APP | Admin</title>
 </head>
 
 <body>
     <nav class="navbar navbar-expand-lg bg-body-tertiary shadow-lg">
         <div class="container">
-            <a class="navbar-brand" href="#">Attendance App</a>
+            <a class="navbar-brand" href="#">USLS HEU ATTENDANCE MONITORING APP</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
