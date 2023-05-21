@@ -8,7 +8,7 @@ if (isset($_GET['search'])) {
     $search_query = $_GET['search'];
     if (!empty($search_query)) {
         $search_query = mysqli_real_escape_string($conn, $_GET['search']);
-        $search_query = "AND (u.last_name LIKE '%$search_query%' OR u.first_name LIKE '%$search_query%')";
+        $search_query = "AND (s.last_name LIKE '%$search_query%' OR s.first_name LIKE '%$search_query%' OR t.last_name LIKE '%$search_query%' OR t.first_name LIKE '%$search_query%' OR c.title LIKE '%$search_query%')";
     }
 }
 
@@ -18,60 +18,21 @@ $sort_field = "";
 if (isset($_GET['sort'])) {
     $sort_field = $_GET['sort'];
     if (!empty($sort_field)) {
-        $sort_field = mysqli_real_escape_string($conn, $_GET['sort']);
-        $valid_sort_fields = ['name', 'class'];
-        if (in_array($sort_field, $valid_sort_fields)) {
-            $sort_query = "ORDER BY $sort_field";
+        if ($sort_field == 'created_at_short') {
+            $sort_field = 'a.created_at';
         }
+        $sort_query = "ORDER BY $sort_field ASC;";
     }
 }
 
-$sql = "SELECT
-        CONCAT_WS(', ', u.last_name, u.first_name) AS student_name,
-        c.title AS class_title,
-        c.absence_limit AS class_limit,
-        COUNT(a.id) AS absences,
-        (c.absence_limit - COUNT(a.id)) AS absences_remaining
-        FROM
-        users u
-        INNER JOIN enrollments e ON u.id = e.student_id
-        INNER JOIN classes c ON e.class_id = c.id
-        LEFT JOIN attendance a ON e.student_id = a.student_id AND e.class_id = a.class_id
-        WHERE
-        u.role = 'student'
-        $search_query
-        GROUP BY
-        u.id, c.id
-        $sort_query;";
+$sql = "SELECT DATE_FORMAT(a.created_at, '%m/%d/%Y') AS created_at_short, CONCAT_WS(', ', s.last_name, s.first_name) AS student_name, c.title, CONCAT_WS(', ', t.last_name, t.first_name) AS teacher_name, CONCAT_WS(' ', DAYNAME(sc.time_start), TIME_FORMAT(sc.time_start, '%h:%i%p'), '-', TIME_FORMAT(sc.time_end, '%h:%i%p')) AS schedule_time 
+        FROM attendance a 
+        JOIN users s ON a.student_id = s.id 
+        JOIN classes c ON a.class_id = c.id 
+        JOIN users t ON c.teacher_id = t.id 
+        JOIN schedules sc ON a.schedule_id = sc.id 
+        WHERE 1 $search_query $sort_query";
 $result = mysqli_query($conn, $sql);
-
-// Create an array to store the sorted data
-$sortedResults = array();
-
-// Loop through the results and store them in the sorted array
-while ($row = mysqli_fetch_assoc($result)) {
-    $sortedResults[] = $row;
-}
-
-if ($sort_field) {
-    // Split the sort field and direction
-    $parts = explode(' ', $sort_field);
-    $sortBy = $parts[0];  // Field to sort by
-    $sortDirection = $parts[1];  // Sort direction (ASC or DESC)
-
-    // Perform the sorting based on the sort field and direction
-    usort($sortedResults, function ($a, $b) use ($sortBy, $sortDirection) {
-        if ($sortBy === 'absences') {
-            return ($sortDirection === 'ASC') ? $a['absences'] - $b['absences'] : $b['absences'] - $a['absences'];
-        } elseif ($sortBy === 'absences_remaining') {
-            return ($sortDirection === 'ASC') ? $a['absences_remaining'] - $b['absences_remaining'] : $b['absences_remaining'] - $a['absences_remaining'];
-        }
-        // Add more conditions for other fields if needed
-
-        // Default: no sorting
-        return 0;
-    });
-}
 
 include('../logout.php');
 ?>
@@ -129,19 +90,17 @@ include('../logout.php');
                                 <form method="GET" class="mb-3">
                                     <div class="row">
                                         <div class="col-md-6 mb-2">
-                                            <input type="text" name="search" id="search" class="form-control" placeholder="Search by name or class" value="<?= isset($_GET['search']) ? htmlspecialchars($_GET['search']) : '' ?>" />
+                                            <input type="text" name="search" id="search" class="form-control" placeholder="Search by name or class" value="<?= isset($_GET['search']) ? $_GET['search'] : '' ?>" />
                                         </div>
                                         <div class="col-md-6">
                                             <select name="sort" id="sort" class="form-select">
                                                 <option value="">Sort by</option>
-                                                <option value="name ASC" <?= isset($_GET['sort']) && $_GET['sort'] == 'name ASC' ? 'selected' : '' ?>>Name (Ascending)</option>
-                                                <option value="name DESC" <?= isset($_GET['sort']) && $_GET['sort'] == 'name DESC' ? 'selected' : '' ?>>Name (Descending)</option>
-                                                <option value="class ASC" <?= isset($_GET['sort']) && $_GET['sort'] == 'class ASC' ? 'selected' : '' ?>>Class (Ascending)</option>
-                                                <option value="class DESC" <?= isset($_GET['sort']) && $_GET['sort'] == 'class DESC' ? 'selected' : '' ?>>Class (Descending)</option>
-                                                <option value="absences ASC" <?= isset($_GET['sort']) && $_GET['sort'] == 'absences ASC' ? 'selected' : '' ?>>Absences (Ascending)</option>
-                                                <option value="absences DESC" <?= isset($_GET['sort']) && $_GET['sort'] == 'absences DESC' ? 'selected' : '' ?>>Absences (Descending)</option>
-                                                <option value="absences_remaining ASC" <?= isset($_GET['sort']) && $_GET['sort'] == 'absences_remaining ASC' ? 'selected' : '' ?>>Absences Remaining (Ascending)</option>
-                                                <option value="absences_remaining DESC" <?= isset($_GET['sort']) && $_GET['sort'] == 'absences_remaining DESC' ? 'selected' : '' ?>>Absences Remaining (Descending)</option>
+                                                <option value="created_at ASC" <?= isset($_GET['sort']) && $_GET['sort'] == 'created_at ASC' ? 'selected' : '' ?>>Date (Ascending)</option>
+                                                <option value="created_at DESC" <?= isset($_GET['sort']) && $_GET['sort'] == 'created_at DESC' ? 'selected' : '' ?>>Date (Descending)</option>
+                                                <option value="student_name ASC" <?= isset($_GET['sort']) && $_GET['sort'] == 'student_name ASC' ? 'selected' : '' ?>>Student Name (Ascending)</option>
+                                                <option value="student_name DESC" <?= isset($_GET['sort']) && $_GET['sort'] == 'student_name DESC' ? 'selected' : '' ?>>Student Name (Descending)</option>
+                                                <option value="title ASC" <?= isset($_GET['sort']) && $_GET['sort'] == 'title ASC' ? 'selected' : '' ?>>Class Name (Ascending)</option>
+                                                <option value="title DESC" <?= isset($_GET['sort']) && $_GET['sort'] == 'title DESC' ? 'selected' : '' ?>>Class Name (Descending)</option>
                                             </select>
                                         </div>
                                         <div class="col-md-12 mt-2">
@@ -149,33 +108,31 @@ include('../logout.php');
                                         </div>
                                     </div>
                                 </form>
-
                                 <table class="table table-striped mt-5">
                                     <thead>
                                         <tr>
+                                            <th scope="col">Date Created</th>
                                             <th scope="col">Student Name</th>
-                                            <th scope="col">Class Title</th>
-                                            <th scope="col">Absences</th>
-                                            <th scope="col">Absences Remaining</th>
-                                            <th scope="col">Class Absence Limit</th>
+                                            <th scope="col">Class Name</th>
+                                            <th scope="col">Teacher Name</th>
+                                            <th scope="col">Schedule Time</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <?php
                                         // Fetch the results and print them in a table row
-                                        foreach ($sortedResults as $row) {
+                                        while ($row = $result->fetch_assoc()) {
                                             $student_name = $row["student_name"];
-                                            $class_title = $row["class_title"];
-                                            $absences = $row["absences"];
-                                            $absences_remaining = $row["absences_remaining"];
-                                            $absence_limit = $row["class_limit"];
+                                            $title = $row["title"];
+                                            $teacher_name = $row["teacher_name"];
+                                            $schedule_time = $row["schedule_time"];
                                         ?>
                                             <tr>
+                                                <td><?= $row["created_at_short"] ?></td>
                                                 <td><?= $student_name ?></td>
-                                                <td><?= $class_title ?></td>
-                                                <td><?= $absences ?></td>
-                                                <td><?= $absences_remaining ?></td>
-                                                <td><?= $absence_limit ?></td>
+                                                <td><?= $title ?></td>
+                                                <td><?= $teacher_name ?></td>
+                                                <td><?= $schedule_time ?></td>
                                             </tr>
                                         <?php
                                         }
